@@ -96,3 +96,46 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+# Password Manager Backend
+
+Un gestor de contraseñas seguro y confiable que centraliza todas tus cuentas en un solo lugar.
+
+## 📋 Descripción
+
+**Password Manager** es una aplicación backend diseñada para ayudarte a gestionar y almacenar todas tus contraseñas de forma segura. No más olvidos de contraseñas, no más notas inseguras, no más riesgos de seguridad.
+
+## 🔒 Seguridad
+
+Las contraseñas se encriptan antes de almacenarse en la base de datos utilizando algoritmos modernos de encriptación.
+
+
+### Características Principales
+
+- 🔐 **Almacenamiento Seguro** - Las contraseñas se almacenan encriptadas
+- 👤 **Gestión de Cuentas** - Organiza todas tus cuentas en un solo lugar
+- 🔍 **Búsqueda Rápida** - Encuentra tus cuentas al instante
+- 🛡️ **Autenticación Segura** - Acceso protegido con autenticación robusta
+- 📱 **API RESTful** - Fácil integración con aplicaciones frontend
+
+## 🚀 Inicio Rápido
+
+### Requisitos Previos
+- Node.js (v14 o superior)
+- npm o yarn
+
+### Instalación
+
+```bash
+# Clonar el repositorio
+git clone [repository-url]
+
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno
+cp .env.example .env
+
+# Ejecutar el servidor
+npm start
+```
