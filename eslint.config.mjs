@@ -1,6 +1,5 @@
 // @ts-check
 import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -32,3 +31,8 @@ export default tseslint.config(
     },
   },
 );
+
+// Configuracion plugin prettier para eslint, mas informacion en https://github.com/prettier/eslint-plugin-prettier?tab=readme-ov-file#options
+const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
+
+module.exports = [eslintPluginPrettierRecommended];
