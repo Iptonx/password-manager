@@ -1,6 +1,11 @@
 // src/modules/auth/auth.service.ts
 
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -8,21 +13,27 @@ import * as bcrypt from 'bcrypt';
 import { User } from 'src/modules/users/entities/user.entity';
 import { RegisterUserDto } from 'src/modules/users/dto/register-user.dto';
 import { LoginUserDto } from 'src/modules/users/dto/login-user.dto';
-
+import { ReactivateAccountDto } from 'src/modules/users/dto/reactivate-account.dto';
 
 @Injectable()
 export class AuthService {
+  private logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterUserDto): Promise<{ message: string; email: string }> {
+  async register(
+    registerDto: RegisterUserDto,
+  ): Promise<{ message: string; email: string }> {
     const { email, passwordHash, encryptionSalt } = registerDto;
 
     // Verificar si el usuario ya existe
-    const existingUser = await this.userRepository.findOne({ where: { email } });
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
       throw new ConflictException('El usuario ya existe');
     }
@@ -47,14 +58,16 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<User> {
     // Buscar usuario por email
     const user = await this.userRepository.findOne({ where: { email } });
-    
+
     if (!user) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
     // Verificar si cuenta está bloqueada
     if (user.isLocked()) {
-      throw new UnauthorizedException('La cuenta está bloqueada. Intente nuevamente más tarde.');
+      throw new UnauthorizedException(
+        'La cuenta está bloqueada. Intente nuevamente más tarde.',
+      );
     }
 
     // Verificar si cuenta está activa
@@ -64,7 +77,7 @@ export class AuthService {
 
     // Verificar contraseña con bcrypt
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    
+
     if (!isPasswordValid) {
       // Incrementar intentos fallidos
       user.incrementFailedLoginAttempts();
@@ -80,19 +93,60 @@ export class AuthService {
     return user;
   }
 
-  async login(loginDto: LoginUserDto): Promise<{ accessToken: string; encryptionSalt: string }> {
+  async login(
+    loginDto: LoginUserDto,
+  ): Promise<{ accessToken: string; encryptionSalt: string }> {
     const { email, password } = loginDto;
-    
+
     // Validar credenciales
     const user = await this.validateUser(email, password);
-    
+
     // Generar JWT
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload);
-    
+
     return {
       accessToken,
       encryptionSalt: user.encryptionSalt,
+    };
+  }
+
+  async reactivateAccount(
+    reactivateDto: ReactivateAccountDto,
+  ): Promise<{ message: string }> {
+    const { email, password } = reactivateDto;
+
+    // Buscar usuario por email
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+    // Verificar contraseña
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    if (!isPasswordValid) {
+      this.logger.warn(
+        `Intento de reactivación con contraseña incorrecta: ${email}`,
+      );
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+    // Verificar si ya está activa
+    if (user.isActive) {
+      throw new ConflictException('La cuenta ya está activa');
+    }
+
+    // Reactivar cuenta
+    user.isActive = true;
+    user.failedLoginAttempts = 0;
+    user.lockedUntil = null;
+    await this.userRepository.save(user);
+
+    this.logger.log(`Cuenta reactivada exitosamente: ${email}`);
+
+    return {
+      message: 'Cuenta reactivada exitosamente. Ahora puede iniciar sesión.',
     };
   }
 

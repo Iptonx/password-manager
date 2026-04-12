@@ -67,7 +67,7 @@ export class UsersService {
     // Verificar contraseña actual
     const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
     if (!isPasswordValid) {
-      throw new BadRequestException('Current password is incorrect');
+      throw new BadRequestException('La contraseña actual es incorrecta');
     }
 
     // Generar nuevo hash para la contraseña
@@ -77,7 +77,7 @@ export class UsersService {
     user.passwordHash = newPasswordHash;
     await this.userRepository.save(user);
 
-    return { message: 'Password changed successfully' };
+    return { message: 'Contraseña cambiada exitosamente' };
   }
 
   async updateEncryptionSalt(userId: string, newSalt: string): Promise<void> {
@@ -90,7 +90,7 @@ export class UsersService {
     const user = await this.findById(userId);
     user.isActive = false;
     await this.userRepository.save(user);
-    return { message: 'Account deactivated successfully' };
+    return { message: 'Cuenta desactivada exitosamente' };
   }
 
   async reactivateAccount(userId: string): Promise<{ message: string }> {
@@ -99,14 +99,14 @@ export class UsersService {
     user.failedLoginAttempts = 0;
     user.lockedUntil = null;
     await this.userRepository.save(user);
-    return { message: 'Account reactivated successfully' };
+    return { message: 'Cuenta reactivada exitosamente' };
   }
 
   async deleteAccount(userId: string): Promise<{ message: string }> {
     const user = await this.findById(userId);
     // Soft delete o hard delete? Por ahora hard delete
     await this.userRepository.remove(user);
-    return { message: 'Account deleted successfully' };
+    return { message: 'Cuenta eliminada exitosamente' };
   }
 
   async updateLastLogin(userId: string): Promise<void> {

@@ -30,10 +30,10 @@ import { AuthModule } from './modules/auth/auth.module';
       }),
     }),
 
-    UsersModule,
-    CategoriesModule,
-    AccountsModule,
     AuthModule,
+    UsersModule,
+    AccountsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
