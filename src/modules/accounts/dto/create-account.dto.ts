@@ -6,8 +6,6 @@ import {
   IsOptional,
   IsUUID,
   IsBoolean,
-  IsUrl,
-  MaxLength,
 } from 'class-validator';
 
 export class CreateAccountDto {
@@ -32,9 +30,9 @@ export class CreateAccountDto {
   @IsOptional()
   notesEncrypted?: string | null;
 
-  @IsUrl()
+  // El valor es texto cifrado (AES-GCM hex/base64), NO una URL en texto plano
+  @IsString()
   @IsOptional()
-  @MaxLength(2048)
   urlEncrypted?: string | null;
 
   // PARÁMETROS DE CIFRADO
