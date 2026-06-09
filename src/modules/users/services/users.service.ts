@@ -1,6 +1,11 @@
 //src\modules\users\services\users.service.ts
 
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -8,12 +13,15 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../entities/user.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
+import { Account } from 'src/modules/accounts/entities/account.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Account)
+    private accountRepository: Repository<Account>,
   ) {}
 
   async findById(id: string): Promise<User> {
@@ -28,18 +36,31 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async findAll(page: number = 1, limit: number = 10): Promise<{ users: User[]; total: number }> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ users: User[]; total: number }> {
     const [users, total] = await this.userRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
       order: { createdAt: 'DESC' },
-      select: ['id', 'email', 'createdAt', 'updatedAt', 'lastLoginAt', 'isActive'], // Excluir campos sensibles
+      select: [
+        'id',
+        'email',
+        'createdAt',
+        'updatedAt',
+        'lastLoginAt',
+        'isActive',
+      ], // Excluir campos sensibles
     });
 
     return { users, total };
   }
 
-  async updateProfile(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async updateProfile(
+    userId: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     const user = await this.findById(userId);
 
     // Solo permitir actualizar campos no sensibles
@@ -60,22 +81,81 @@ export class UsersService {
     return user;
   }
 
-  async changePassword(userId: string, changePasswordDto: ChangePasswordDto): Promise<{ message: string }> {
+  // async changePassword(userId: string, changePasswordDto: ChangePasswordDto): Promise<{ message: string }> {
+  //   const user = await this.findById(userId);
+  //   const { currentPassword, newPassword } = changePasswordDto;
+
+  //   // Verificar contraseña actual
+  //   const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+  //   if (!isPasswordValid) {
+  //     throw new BadRequestException('La contraseña actual es incorrecta');
+  //   }
+
+  //   // Generar nuevo hash para la contraseña
+  //   const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+  //   // Actualizar password hash
+  //   user.passwordHash = newPasswordHash;
+  //   await this.userRepository.save(user);
+
+  //   return { message: 'Contraseña cambiada exitosamente' };
+  // }
+
+  async changePassword(
+    userId: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
     const user = await this.findById(userId);
-    const { currentPassword, newPassword } = changePasswordDto;
+    const { currentPassword, newPassword, newEncryptionSalt, accounts } =
+      changePasswordDto;
 
     // Verificar contraseña actual
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new BadRequestException('La contraseña actual es incorrecta');
     }
 
-    // Generar nuevo hash para la contraseña
+    // Generar nuevo hash para la nueva contraseña
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
-
-    // Actualizar password hash
     user.passwordHash = newPasswordHash;
+
+    // Si se proporciona nuevo salt y cuentas re-encriptadas, guardarlos
+    if (newEncryptionSalt) {
+      user.encryptionSalt = newEncryptionSalt;
+    }
+
     await this.userRepository.save(user);
+
+    // Si hay cuentas re-encriptadas, actualizarlas
+    // if (accounts && accounts.length > 0) {
+    //   const accountRepo = this.userRepository.manager.getRepository(Account);
+
+    //   for (const acc of accounts) {
+    //     await accountRepo.update(acc.id, {
+    //       serviceNameEncrypted: acc.serviceNameEncrypted,
+    //       usernameEncrypted: acc.usernameEncrypted,
+    //       passwordEncrypted: acc.passwordEncrypted,
+    //       urlEncrypted: acc.urlEncrypted,
+    //       encryptionIv: acc.encryptionIv,
+    //       serviceNameHash: acc.serviceNameHash,
+    //     });
+    //   }
+    // }
+    if (accounts && accounts.length > 0) {
+      for (const acc of accounts) {
+        await this.accountRepository.update(acc.id, {
+          serviceNameEncrypted: acc.serviceNameEncrypted,
+          usernameEncrypted: acc.usernameEncrypted,
+          passwordEncrypted: acc.passwordEncrypted,
+          urlEncrypted: acc.urlEncrypted,
+          encryptionIv: acc.encryptionIv,
+          serviceNameHash: acc.serviceNameHash,
+        });
+      }
+    }
 
     return { message: 'Contraseña cambiada exitosamente' };
   }
