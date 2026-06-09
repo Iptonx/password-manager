@@ -1,7 +1,7 @@
 // src\modules\accounts\entities\account.entity.ts
 
-import { User } from 'src/modules/users/entities/user.entity';
-import { Category } from 'src/modules/categories/entities/category.entity';
+import { User } from '../../users/entities/user.entity';
+import { Category } from '../../categories/entities/category.entity';
 import {
   Entity,
   Column,

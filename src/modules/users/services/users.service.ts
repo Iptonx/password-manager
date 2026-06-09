@@ -13,7 +13,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../entities/user.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
-import { Account } from 'src/modules/accounts/entities/account.entity';
+import { Account } from '../../accounts/entities/account.entity';
 
 @Injectable()
 export class UsersService {

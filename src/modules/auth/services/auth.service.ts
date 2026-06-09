@@ -10,10 +10,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/modules/users/entities/user.entity';
-import { RegisterUserDto } from 'src/modules/users/dto/register-user.dto';
-import { LoginUserDto } from 'src/modules/users/dto/login-user.dto';
-import { ReactivateAccountDto } from 'src/modules/users/dto/reactivate-account.dto';
+import { User } from '../../users/entities/user.entity';
+import { RegisterUserDto } from '../../users/dto/register-user.dto';
+import { LoginUserDto } from '../../users/dto/login-user.dto';
+import { ReactivateAccountDto } from '../../users/dto/reactivate-account.dto';
 
 @Injectable()
 export class AuthService {

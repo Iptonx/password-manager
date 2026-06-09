@@ -4,7 +4,7 @@ import { Injectable, NotFoundException, ConflictException, ForbiddenException, L
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from '../entities/category.entity';
-import { AccountsService } from 'src/modules/accounts/services/accounts.service';
+import { AccountsService } from '../../accounts/services/accounts.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { ReorderCategoriesDto } from '../dto/reorder-categories.dto';

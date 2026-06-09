@@ -2,11 +2,11 @@
 
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { RegisterUserDto } from 'src/modules/users/dto/register-user.dto';
-import { RegisterResponseDto } from 'src/modules/users/dto/register-response.dto';
-import { LoginUserDto } from 'src/modules/users/dto/login-user.dto';
-import { LoginResponseDto } from 'src/modules/users/dto/login-response.dto';
-import { ReactivateAccountDto } from 'src/modules/users/dto/reactivate-account.dto';
+import { RegisterUserDto } from '../../users/dto/register-user.dto';
+import { RegisterResponseDto } from '../../users/dto/register-response.dto';
+import { LoginUserDto } from '../../users/dto/login-user.dto';
+import { LoginResponseDto } from '../../users/dto/login-response.dto';
+import { ReactivateAccountDto } from '../../users/dto/reactivate-account.dto';
 
 @Controller('auth')
 export class AuthController {

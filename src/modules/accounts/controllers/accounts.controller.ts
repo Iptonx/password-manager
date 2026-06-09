@@ -14,9 +14,9 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { AccountsService } from '../services/accounts.service';
-import { CurrentUser } from 'src/modules/auth/decorators/current-user.decorator';
+import { CurrentUser } from '../../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { AccountResponseDto } from '../dto/account-response.dto';
 import { SearchAccountDto } from '../dto/search-account.dto';

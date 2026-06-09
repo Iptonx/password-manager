@@ -1,7 +1,7 @@
 // src\modules\users\entities\user.entity.ts
 
-import { Account } from 'src/modules/accounts/entities/account.entity';
-import { Category } from 'src/modules/categories/entities/category.entity';
+import { Account } from '../../accounts/entities/account.entity';
+import { Category } from '../../categories/entities/category.entity';
 import {
   Column,
   CreateDateColumn,
